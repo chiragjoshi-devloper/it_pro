@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "Your_NodeJS_Environment_Name"
+        nodejs "Nodes" // Ensure that this matches the NodeJS name in Jenkins Global Tool Configuration
     }
 
     stages {
@@ -30,9 +30,9 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 // SSH into the server and deploy
-                sshagent (credentials: ['your-ssh-credential-id']) {
+                sshagent(credentials: ['02afc25f-95f8-41cf-a873-2faa6e8f7dfe']) {
                     sh '''
-                    ssh user@your-server-ip << EOF
+                    ssh -o StrictHostKeyChecking=no ubuntu@65.2.189.80 << EOF
                     cd /path/to/deployment
                     git pull origin main
                     npm install --production
@@ -46,8 +46,18 @@ pipeline {
 
     post {
         always {
-            echo 'Clean up!'
-            // Optionally clean up or notify
+            echo 'Cleaning up and notifying...'
+            // Optionally, add clean-up steps or notifications (email, slack, etc.)
+        }
+
+        success {
+            echo 'Deployment completed successfully!'
+            // Optionally, notify that the build was successful (e.g., via Slack, email, etc.)
+        }
+
+        failure {
+            echo 'Deployment failed!'
+            // Optionally, notify failure (e.g., via Slack, email, etc.)
         }
     }
 }
